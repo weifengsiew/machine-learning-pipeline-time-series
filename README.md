@@ -119,7 +119,8 @@ repository's modular structure.
 | `src/time_series_pipeline/pipelines/feature_engineering/nodes.py` | Post-June-2012 feature engineering |
 | `src/time_series_pipeline/pipelines/data_validation/expectations.py` | Code-defined Great Expectations suite |
 | `src/time_series_pipeline/pipelines/data_validation/reporting.py` | Tabular validation reports for Kedro artifacts |
-| `src/ml_model.py` | Model primitives and reporting plots used by Kedro nodes |
+| `src/time_series_pipeline/pipelines/model_training/nodes.py` | Model registries, tuning, comparison, and selection |
+| `src/time_series_pipeline/pipelines/model_evaluation/nodes.py` | Forecasting, metrics, and reporting plots |
 | `conf/base/catalog.yml` | Kedro dataset locations and output formats |
 | `conf/base/parameters.yml` | Post-June-2012 Kedro run parameters |
 | `.github/workflows/publish-kedro-viz.yml` | CI run and GitHub Pages publication |

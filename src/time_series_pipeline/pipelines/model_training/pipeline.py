@@ -83,7 +83,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
             node(
                 func=fit_baselines,
-                inputs=["complete_raw_X_train", "complete_y_train"],
+                inputs=None,
                 outputs=["baseline_one_day", "baseline_one_week"],
                 name="fit_baselines",
             ),
