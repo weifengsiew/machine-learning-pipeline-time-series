@@ -53,11 +53,15 @@ jobs:
       - name: Install project dependencies
         run: uv sync --locked
 
+      - name: Validate Kedro-Viz build
+        if: github.event_name == 'pull_request'
+        run: uv run kedro viz build
+
       - name: Deploy Kedro-Viz to GitHub Pages
+        if: github.event_name == 'push'
         uses: kedro-org/publish-kedro-viz@v3
         with:
           project_path: "."
           python_manager: "uv"
           telemetry_consent: false
           deployment_check: false
-          auto_deploy: ${{ github.event_name == 'push' }}
