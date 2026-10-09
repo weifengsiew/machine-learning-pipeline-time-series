@@ -2,7 +2,7 @@
 
 from kedro.pipeline import Pipeline, node
 
-from .nodes import clean_store_data
+from .nodes import convert_datetime, fill_event_nulls, sort_by_datetime
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -10,11 +10,23 @@ def create_pipeline(**kwargs) -> Pipeline:
     return Pipeline(
         [
             node(
-                func=clean_store_data,
+                func=convert_datetime,
                 inputs="raw_store_data",
+                outputs="datetime_store_data",
+                name="convert_datetime",
+            ),
+            node(
+                func=sort_by_datetime,
+                inputs="datetime_store_data",
+                outputs="sorted_store_data",
+                name="sort_by_datetime",
+            ),
+            node(
+                func=fill_event_nulls,
+                inputs="sorted_store_data",
                 outputs="cleaned_store_data",
-                name="clean_store_data",
-            )
+                name="fill_event_nulls",
+            ),
         ]
     )
 

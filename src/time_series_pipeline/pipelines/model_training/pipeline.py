@@ -3,11 +3,13 @@
 from kedro.pipeline import Pipeline, node
 
 from .nodes import (
+    build_candidate_grids,
+    build_candidate_models,
     compare_models,
     fit_baselines,
     select_best_model,
     select_complete_rows,
-    tune_models,
+    tune_candidate_models,
 )
 
 
@@ -16,10 +18,28 @@ def create_pipeline(**kwargs) -> Pipeline:
     return Pipeline(
         [
             node(
-                func=tune_models,
-                inputs=["X_train", "y_train", "params:cv_splits"],
+                func=build_candidate_models,
+                inputs=None,
+                outputs="candidate_models",
+                name="build_candidate_models",
+            ),
+            node(
+                func=build_candidate_grids,
+                inputs="candidate_models",
+                outputs="candidate_grids",
+                name="build_candidate_grids",
+            ),
+            node(
+                func=tune_candidate_models,
+                inputs=[
+                    "X_train",
+                    "y_train",
+                    "candidate_models",
+                    "candidate_grids",
+                    "params:cv_splits",
+                ],
                 outputs=["tuned_models", "tuning_results"],
-                name="tune_models",
+                name="tune_candidate_models",
             ),
             node(
                 func=select_complete_rows,

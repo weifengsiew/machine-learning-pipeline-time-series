@@ -1,6 +1,6 @@
 # Time series: group report
 
-[Open the interactive Kedro-Viz pipeline](https://weifengsiew.github.io/machine-learning-pipeline-time-series/)
+[Open the interactive Kedro-Viz pipeline](https://weifengsiew.github.io/machine-learning-pipeline-time-series/?types=nodes&expandAllPipelines=false&pid=__default__)
 
 ## Problem
 
@@ -93,14 +93,15 @@ datasets follow the project structure under `data/raw_data/`,
 `data/cleaned_data/`, and `data/feature_engineered_data/`. Model and reporting
 artifacts are kept under `results/kedro/post_june_2012/`.
 
-The modular stages are:
+The modular stages are split into explicit nodes, following the reference
+repository's stage-by-stage structure:
 
-1. `data_ingestion` — aggregate the M5 files into the configured store's daily series.
-2. `data_cleaning` — standardise dates and event labels.
-3. `data_validation` — record pre-cleaning evidence and enforce the cleaned-data contract.
-4. `feature_engineering` — filter before feature creation and build leakage-safe features.
+1. `data_ingestion` — `load_store_data` aggregates the M5 files into the configured store's daily series.
+2. `data_cleaning` — `convert_datetime` → `sort_by_datetime` → `fill_event_nulls`.
+3. `data_validation` — `build_expectation_suite`, then `validate_raw_data` and `validate_cleaned_data`.
+4. `feature_engineering` — `filter_start_date` → `add_event_indicator` → `select_base_features` → `add_lag_features` → `add_cyclical_features` → `add_rolling_features` → `align_target_calendar_features` → `add_target`.
 5. `train_test_split` — create the chronological split and fit preprocessing on training data only.
-6. `model_training` — tune regressors, fit naive baselines, and select the best learned model.
+6. `model_training` — `build_candidate_models` → `build_candidate_grids` → `tune_candidate_models`, followed by complete-row selection, model comparison, baseline fitting, and model selection.
 7. `model_evaluation` — create forecasts, metrics, and plots.
 
 Each stage has its own `nodes.py` and `pipeline.py`. The
@@ -113,7 +114,9 @@ repository's modular structure.
 | File | Responsibility |
 |---|---|
 | `src/time_series_pipeline/` | Kedro package and modular pipeline stages |
-| `src/prepare_store_data.py`, `src/clean_data.py`, `src/validate_data.py` | Domain transformations used by Kedro nodes |
+| `src/prepare_store_data.py`, `src/clean_data.py` | Domain transformations used by Kedro nodes |
+| `src/time_series_pipeline/pipelines/data_validation/expectations.py` | Code-defined Great Expectations suite |
+| `src/time_series_pipeline/pipelines/data_validation/reporting.py` | Tabular validation reports for Kedro artifacts |
 | `src/engineer_features.py`, `src/ml_model.py` | Feature engineering and model implementations used by Kedro nodes |
 | `conf/base/catalog.yml` | Kedro dataset locations and output formats |
 | `conf/base/parameters.yml` | Post-June-2012 Kedro run parameters |
@@ -201,8 +204,10 @@ Key artifacts include:
 |---|---|
 | `model_comparison.csv` | Train and test RMSE for tuned models and baselines |
 | `tuning_results.csv` | Cross-validation RMSE and selected configurations |
-| `validation_before_cleaning.csv` | Data-quality checks before cleaning |
-| `validation_after_cleaning.csv` | Data-quality checks after cleaning |
+| `validation_before_cleaning.json` | Complete Great Expectations result for raw data |
+| `validation_after_cleaning.json` | Complete Great Expectations result for cleaned data; must pass |
+| `validation_before_cleaning.csv` | Tabular Great Expectations results for raw data |
+| `validation_after_cleaning.csv` | Tabular Great Expectations results for cleaned data |
 | `predicted_vs_actual.png` | Selected-model predictions against actual sales with error guides |
 | `forecast_errors.csv` | Actual values, forecasts, and forecast errors |
 | `models/` | Serialized tuned models and naive baselines |

@@ -1,25 +1,60 @@
-"""Nodes for recording validation evidence before and after cleaning."""
+"""Nodes for running the shared Great Expectations suite twice."""
 
+from __future__ import annotations
+
+from typing import Any
+
+import great_expectations as gx
 import pandas as pd
+from great_expectations import ExpectationSuite
 
-from validate_data import ValidateData
-
-
-def _validation_frame(frame: pd.DataFrame, enforce: bool) -> pd.DataFrame:
-    """Return validation results in a catalog-friendly tabular form."""
-    validation = ValidateData().validate_data(frame, enforce=enforce)
-    return validation.rename("passed").to_frame()
+from .reporting import build_validation_report
 
 
-def validate_store_data(
+def _run_validation(
+    frame: pd.DataFrame,
+    expectation_suite: ExpectationSuite,
+    table_name: str,
+) -> tuple[dict[str, Any], pd.DataFrame]:
+    """Run one in-memory GX validation and build its tabular report."""
+    context = gx.get_context(mode="ephemeral")
+    data_source = context.data_sources.add_pandas(f"{table_name}_source")
+    data_asset = data_source.add_dataframe_asset(name=table_name)
+    batch_definition = data_asset.add_batch_definition_whole_dataframe("whole_table")
+    batch_request = batch_definition.build_batch_request(
+        batch_parameters={"dataframe": frame}
+    )
+    validator = context.get_validator(
+        batch_request=batch_request,
+        expectation_suite=expectation_suite,
+    )
+    validation_result = validator.validate().to_json_dict()
+    return validation_result, build_validation_report(validation_result)
+
+
+def validate_raw_data(
     raw_store_data: pd.DataFrame,
+    expectation_suite: ExpectationSuite,
+) -> tuple[dict[str, Any], pd.DataFrame]:
+    """Validate raw data and retain failures as evidence for the report."""
+    return _run_validation(raw_store_data, expectation_suite, "raw_store_data")
+
+
+def validate_cleaned_data(
     cleaned_store_data: pd.DataFrame,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Validate raw evidence and enforce the cleaned-data contract."""
-    raw_validation = _validation_frame(raw_store_data, enforce=False)
-    cleaned_validation = _validation_frame(cleaned_store_data, enforce=False)
-    if not cleaned_validation["passed"].all():
-        failed_checks = cleaned_validation.index[~cleaned_validation["passed"]].tolist()
-        raise AssertionError(f"Data validation failed: {failed_checks}")
-    return raw_validation, cleaned_validation
+    expectation_suite: ExpectationSuite,
+) -> tuple[dict[str, Any], pd.DataFrame]:
+    """Validate cleaned data and fail the pipeline if any expectation fails."""
+    validation_result, report = _run_validation(
+        cleaned_store_data,
+        expectation_suite,
+        "cleaned_store_data",
+    )
+    if not validation_result["success"]:
+        failed_expectations = report.loc[~report["success"], "expectation_type"].tolist()
+        raise AssertionError(
+            "Cleaned data failed Great Expectations: "
+            f"{failed_expectations}"
+        )
+    return validation_result, report
 

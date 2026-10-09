@@ -1,7 +1,7 @@
 """Define, train, and evaluate the time-series forecasting models."""
 
 import pickle
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 
 import matplotlib
@@ -469,8 +469,10 @@ class ModelTraining:
         self,
         features: pd.DataFrame,
         target: pd.Series,
+        model_names: Sequence[str] | None = None,
+        model_param_grids: Mapping[str, dict[str, list[object]]] | None = None,
     ) -> tuple[dict[str, ForecastModel], pd.DataFrame]:
-        """Tune all registered models with expanding time-series validation.
+        """Tune candidate models with expanding time-series validation.
 
         Parameters
         ----------
@@ -478,6 +480,11 @@ class ModelTraining:
             Candidate model features.
         target : pandas.Series
             Target values aligned with ``features``.
+        model_names : sequence of str, optional
+            Candidate registry names. All registered models are used by default.
+        model_param_grids : mapping, optional
+            Parameter grids keyed by candidate registry name. The registered
+            grids are used by default.
 
         Returns
         -------
@@ -487,14 +494,19 @@ class ModelTraining:
         """
         complete_features, complete_target = self.select_complete_rows(features, target)
         time_series_split = TimeSeriesSplit(n_splits=self.cv_splits)
+        selected_model_names = tuple(model_names or MODEL_FACTORIES)
+        selected_param_grids = model_param_grids or {
+            model_name: MODEL_PARAM_GRIDS[model_name]
+            for model_name in selected_model_names
+        }
         tuned_models = {}
         tuning_rows = []
 
-        for model_name in MODEL_FACTORIES:
+        for model_name in selected_model_names:
             print(f"  Tuning {model_name}...")
             grid_search = GridSearchCV(
                 estimator=build_model(model_name),
-                param_grid=MODEL_PARAM_GRIDS[model_name],
+                param_grid=selected_param_grids[model_name],
                 scoring=self.scoring,
                 cv=time_series_split,
                 n_jobs=-1,

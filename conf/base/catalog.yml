@@ -42,17 +42,28 @@ baseline_one_week:
   type: pickle.PickleDataset
   filepath: results/kedro/post_june_2012/models/baseline_naive_1_week.pkl
 
+expectation_suite:
+  type: MemoryDataset
+
+raw_validation_result:
+  type: json.JSONDataset
+  filepath: results/kedro/post_june_2012/validation_before_cleaning.json
+
+cleaned_validation_result:
+  type: json.JSONDataset
+  filepath: results/kedro/post_june_2012/validation_after_cleaning.json
+
 validation_before_cleaning:
   type: pandas.CSVDataset
   filepath: results/kedro/post_june_2012/validation_before_cleaning.csv
   save_args:
-    index: true
+    index: false
 
 validation_after_cleaning:
   type: pandas.CSVDataset
   filepath: results/kedro/post_june_2012/validation_after_cleaning.csv
   save_args:
-    index: true
+    index: false
 
 tuning_results:
   type: pandas.CSVDataset

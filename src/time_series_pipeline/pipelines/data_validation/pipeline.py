@@ -1,20 +1,33 @@
-"""Kedro pipeline for validation evidence."""
+"""Kedro pipeline for Great Expectations validation evidence."""
 
 from kedro.pipeline import Pipeline, node
 
-from .nodes import validate_store_data
+from .expectations import build_expectation_suite
+from .nodes import validate_cleaned_data, validate_raw_data
 
 
 def create_pipeline(**kwargs) -> Pipeline:
-    """Create the data-validation pipeline."""
+    """Apply one shared suite to raw data and cleaned data."""
     return Pipeline(
         [
             node(
-                func=validate_store_data,
-                inputs=["raw_store_data", "cleaned_store_data"],
-                outputs=["validation_before_cleaning", "validation_after_cleaning"],
-                name="validate_store_data",
-            )
+                func=build_expectation_suite,
+                inputs=None,
+                outputs="expectation_suite",
+                name="build_expectation_suite",
+            ),
+            node(
+                func=validate_raw_data,
+                inputs=["raw_store_data", "expectation_suite"],
+                outputs=["raw_validation_result", "validation_before_cleaning"],
+                name="validate_raw_data",
+            ),
+            node(
+                func=validate_cleaned_data,
+                inputs=["cleaned_store_data", "expectation_suite"],
+                outputs=["cleaned_validation_result", "validation_after_cleaning"],
+                name="validate_cleaned_data",
+            ),
         ]
     )
 

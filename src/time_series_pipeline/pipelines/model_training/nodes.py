@@ -2,7 +2,20 @@
 
 import pandas as pd
 
-from ml_model import Baseline, ModelTraining
+from ml_model import MODEL_FACTORIES, MODEL_PARAM_GRIDS, Baseline, ModelTraining
+
+
+def build_candidate_models() -> list[str]:
+    """Return the configured model registry names for this experiment."""
+    return list(MODEL_FACTORIES)
+
+
+def build_candidate_grids(candidate_models: list[str]) -> dict[str, dict]:
+    """Return parameter grids for the configured candidate models."""
+    return {
+        model_name: MODEL_PARAM_GRIDS[model_name]
+        for model_name in candidate_models
+    }
 
 
 def tune_models(
@@ -11,7 +24,30 @@ def tune_models(
     cv_splits: int,
 ) -> tuple[dict, pd.DataFrame]:
     """Tune the configured regressors using expanding time-series folds."""
-    return ModelTraining(cv_splits=cv_splits).tune_models(X_train, y_train)
+    candidate_models = build_candidate_models()
+    return tune_candidate_models(
+        X_train,
+        y_train,
+        candidate_models,
+        build_candidate_grids(candidate_models),
+        cv_splits,
+    )
+
+
+def tune_candidate_models(
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    candidate_models: list[str],
+    candidate_grids: dict[str, dict],
+    cv_splits: int,
+) -> tuple[dict, pd.DataFrame]:
+    """Tune candidate regressors using expanding time-series folds."""
+    return ModelTraining(cv_splits=cv_splits).tune_models(
+        X_train,
+        y_train,
+        model_names=candidate_models,
+        model_param_grids=candidate_grids,
+    )
 
 
 def select_complete_rows(
