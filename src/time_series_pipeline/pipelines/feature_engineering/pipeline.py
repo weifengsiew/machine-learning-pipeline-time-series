@@ -9,7 +9,6 @@ from .nodes import (
     add_rolling_features,
     add_target,
     align_target_calendar_features,
-    filter_start_date,
     select_base_features,
 )
 
@@ -19,14 +18,8 @@ def create_pipeline(**kwargs) -> Pipeline:
     return Pipeline(
         [
             node(
-                func=filter_start_date,
-                inputs=["cleaned_store_data", "params:start_date"],
-                outputs="filtered_cleaned_store_data",
-                name="filter_start_date",
-            ),
-            node(
                 func=add_event_indicator,
-                inputs="filtered_cleaned_store_data",
+                inputs="cleaned_store_data",
                 outputs="event_features",
                 name="add_event_indicator",
             ),

@@ -1,32 +1,18 @@
-"""Kedro pipeline for chronological model-data preparation."""
+"""Kedro pipeline for fitting and applying model preprocessing."""
 
 from kedro.pipeline import Pipeline, node
 
 from .nodes import (
     build_training_preprocessor,
-    create_train_test_split,
     fit_transform_training_data,
-    split_features_and_target,
     transform_test_data,
 )
 
 
 def create_pipeline(**kwargs) -> Pipeline:
-    """Create the train/test and preprocessing pipeline."""
+    """Create the model preprocessing pipeline."""
     return Pipeline(
         [
-            node(
-                func=split_features_and_target,
-                inputs="engineered_data",
-                outputs=["features", "target"],
-                name="split_features_and_target",
-            ),
-            node(
-                func=create_train_test_split,
-                inputs=["features", "target", "params:test_start_date"],
-                outputs=["raw_X_train", "raw_X_test", "y_train", "y_test"],
-                name="create_train_test_split",
-            ),
             node(
                 func=build_training_preprocessor,
                 inputs="raw_X_train",
@@ -47,4 +33,3 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
         ]
     )
-

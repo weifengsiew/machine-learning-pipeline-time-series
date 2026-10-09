@@ -1,8 +1,8 @@
-"""Kedro pipeline for cleaning the store-level table."""
+"""Kedro pipeline for cleaning and scoping the store-level table."""
 
 from kedro.pipeline import Pipeline, node
 
-from .nodes import convert_datetime, fill_event_nulls, sort_by_datetime
+from .nodes import convert_datetime, fill_event_nulls, filter_start_date, sort_by_datetime
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -24,8 +24,14 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=fill_event_nulls,
                 inputs="sorted_store_data",
-                outputs="cleaned_store_data",
+                outputs="event_cleaned_store_data",
                 name="fill_event_nulls",
+            ),
+            node(
+                func=filter_start_date,
+                inputs=["event_cleaned_store_data", "params:start_date"],
+                outputs="cleaned_store_data",
+                name="filter_start_date",
             ),
         ]
     )

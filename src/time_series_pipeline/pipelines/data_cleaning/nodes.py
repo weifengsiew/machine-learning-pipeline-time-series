@@ -1,4 +1,4 @@
-"""Nodes for cleaning the aggregated store table."""
+"""Nodes for cleaning and scoping the aggregated store table."""
 
 import pandas as pd
 
@@ -37,4 +37,14 @@ def fill_event_nulls(sorted_store_data: pd.DataFrame) -> pd.DataFrame:
         if column in cleaned.columns:
             cleaned[column] = cleaned[column].fillna("No event")
     return cleaned
+
+
+def filter_start_date(
+    event_cleaned_store_data: pd.DataFrame,
+    start_date: str,
+) -> pd.DataFrame:
+    """Retain observations from the configured post-June-2012 boundary."""
+    return event_cleaned_store_data.loc[
+        event_cleaned_store_data.index >= pd.Timestamp(start_date)
+    ].copy()
 

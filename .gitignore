@@ -49,7 +49,6 @@ data/raw_data/
 data/cleaned_data/
 data/feature_engineered_data/
 
-# Generated Kedro validation, experiment, and reporting outputs
-results/kedro/
-results/validation/
-results/ml_experiments/
+# Generated pipeline validation, experiment, and reporting outputs
+results/*
+!results/.gitkeep

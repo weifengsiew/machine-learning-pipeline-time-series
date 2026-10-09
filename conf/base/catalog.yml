@@ -6,10 +6,6 @@ cleaned_store_data:
   type: pickle.PickleDataset
   filepath: data/cleaned_data/WI_2_cleaned.pkl
 
-filtered_cleaned_store_data:
-  type: pickle.PickleDataset
-  filepath: data/cleaned_data/WI_2_post_june_2012.pkl
-
 engineered_data:
   type: pickle.PickleDataset
   filepath: data/feature_engineered_data/WI_2_engineered.pkl
@@ -24,77 +20,77 @@ target:
 
 tuned_models:
   type: pickle.PickleDataset
-  filepath: results/kedro/post_june_2012/models/tuned_models.pkl
+  filepath: results/models/tuned_models.pkl
 
 selected_model:
   type: pickle.PickleDataset
-  filepath: results/kedro/post_june_2012/models/selected_model.pkl
+  filepath: results/models/selected_model.pkl
 
 selected_model_name:
   type: pickle.PickleDataset
-  filepath: results/kedro/post_june_2012/models/selected_model_name.pkl
+  filepath: results/models/selected_model_name.pkl
 
 baseline_one_day:
   type: pickle.PickleDataset
-  filepath: results/kedro/post_june_2012/models/baseline_naive_1_day.pkl
+  filepath: results/models/baseline_naive_1_day.pkl
 
 baseline_one_week:
   type: pickle.PickleDataset
-  filepath: results/kedro/post_june_2012/models/baseline_naive_1_week.pkl
+  filepath: results/models/baseline_naive_1_week.pkl
 
 expectation_suite:
   type: MemoryDataset
 
 raw_validation_result:
   type: json.JSONDataset
-  filepath: results/kedro/post_june_2012/validation_before_cleaning.json
+  filepath: results/validation_before_cleaning.json
 
 cleaned_validation_result:
   type: json.JSONDataset
-  filepath: results/kedro/post_june_2012/validation_after_cleaning.json
+  filepath: results/validation_after_cleaning.json
 
 validation_before_cleaning:
   type: pandas.CSVDataset
-  filepath: results/kedro/post_june_2012/validation_before_cleaning.csv
+  filepath: results/validation_before_cleaning.csv
   save_args:
     index: false
 
 validation_after_cleaning:
   type: pandas.CSVDataset
-  filepath: results/kedro/post_june_2012/validation_after_cleaning.csv
+  filepath: results/validation_after_cleaning.csv
   save_args:
     index: false
 
 tuning_results:
   type: pandas.CSVDataset
-  filepath: results/kedro/post_june_2012/tuning_results.csv
+  filepath: results/tuning_results.csv
   save_args:
     index: false
 
 model_comparison:
   type: pandas.CSVDataset
-  filepath: results/kedro/post_june_2012/model_comparison.csv
+  filepath: results/model_comparison.csv
   save_args:
     index: false
 
 forecast_errors:
   type: pandas.CSVDataset
-  filepath: results/kedro/post_june_2012/forecast_errors.csv
+  filepath: results/forecast_errors.csv
   save_args:
     index: true
 
 metrics:
   type: json.JSONDataset
-  filepath: results/kedro/post_june_2012/metrics.json
+  filepath: results/metrics.json
 
 forecast_plot:
   type: matplotlib.MatplotlibDataset
-  filepath: results/kedro/post_june_2012/forecast.png
+  filepath: results/forecast.png
 
 predicted_vs_actual_plot:
   type: matplotlib.MatplotlibDataset
-  filepath: results/kedro/post_june_2012/predicted_vs_actual.png
+  filepath: results/predicted_vs_actual.png
 
 model_comparison_plot:
   type: matplotlib.MatplotlibDataset
-  filepath: results/kedro/post_june_2012/model_comparison.png
+  filepath: results/model_comparison.png

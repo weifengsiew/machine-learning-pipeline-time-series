@@ -1,6 +1,5 @@
-"""Chronological splitting and preprocessing pipeline."""
+"""Chronological train/test split pipeline."""
 
 from .pipeline import create_pipeline
 
 __all__ = ["create_pipeline"]
-

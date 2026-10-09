@@ -6,11 +6,33 @@ import pandas as pd
 TARGET_LAG_DAYS = {
     "sales_lag_1_day": 1,
     "sales_lag_2_days": 2,
+    "sales_lag_3_days": 3,
+    "sales_lag_6_days": 6,
     "sales_lag_1_week": 7,
-    "sales_lag_2_weeks": 14,
+    "sales_lag_27_days": 27,
     "sales_lag_4_weeks": 28,
+    "sales_lag_29_days": 29,
     "sales_lag_1_month": 30,
+    "sales_lag_31_days": 31,
+    "sales_lag_33_days": 33,
+    "sales_lag_34_days": 34,
+    "sales_lag_35_days": 35,
+    "sales_lag_61_days": 61,
+    "sales_lag_62_days": 62,
+    "sales_lag_63_days": 63,
+    "sales_lag_64_days": 64,
     "sales_lag_1_quarter": 90,
+    "sales_lag_91_days": 91,
+    "sales_lag_92_days": 92,
+    "sales_lag_119_days": 119,
+    "sales_lag_120_days": 120,
+    "sales_lag_153_days": 153,
+    "sales_lag_154_days": 154,
+    "sales_lag_181_days": 181,
+    "sales_lag_182_days": 182,
+    "sales_lag_183_days": 183,
+    "sales_lag_245_days": 245,
+    "sales_lag_273_days": 273,
     "sales_lag_1_year": 365,
 }
 ROLLING_COLUMNS = [
@@ -27,28 +49,18 @@ def _validate_horizon(horizon: int) -> None:
         raise ValueError("horizon_days must not exceed the shortest target-relative lag")
 
 
-def filter_start_date(
-    cleaned_store_data: pd.DataFrame,
-    start_date: str,
-) -> pd.DataFrame:
-    """Retain observations from the configured post-June-2012 boundary."""
-    return cleaned_store_data.loc[
-        cleaned_store_data.index >= pd.Timestamp(start_date)
-    ].copy()
-
-
 def add_event_indicator(
-    filtered_cleaned_store_data: pd.DataFrame,
+    cleaned_store_data: pd.DataFrame,
 ) -> pd.DataFrame:
     """Add an indicator for whether a calendar event is present."""
     event_name_columns = [
         column
         for column in ("event_name_1", "event_name_2")
-        if column in filtered_cleaned_store_data
+        if column in cleaned_store_data
     ]
     if not event_name_columns:
         raise KeyError("Missing event name columns")
-    features = filtered_cleaned_store_data.copy()
+    features = cleaned_store_data.copy()
     features["has_event"] = (
         features[event_name_columns].ne("No event").any(axis=1).astype(int)
     )
