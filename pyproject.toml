@@ -1,0 +1,41 @@
+[project]
+name = "ts"
+version = "0.1.0"
+description = "Group project: forecast one Walmart store's daily sales, one day ahead."
+requires-python = ">=3.12"
+dependencies = [
+    "kedro>=0.19.14,<1.0",
+    "kedro-datasets[matplotlib]>=7.0,<9.0",
+    "kedro-viz>=8.0,<9.0",
+    "graphql-core>=3.2,<3.3",
+    "strawberry-graphql>=0.192,<0.262.4",
+    "toposort>=1.10,<2.0",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "matplotlib",
+    "pydantic>=2.7,<2.11",
+    "statsmodels",
+]
+
+[dependency-groups]
+dev = ["pytest", "ruff", "ipykernel", "nbconvert"]
+
+# This directory holds a project, not an installable package.
+[tool.uv]
+package = false
+
+[tool.kedro]
+project_name = "Machine Learning Pipeline Time Series"
+package_name = "time_series_pipeline"
+source_dir = "src"
+kedro_init_version = "0.19.15"
+
+[tool.pytest.ini_options]
+pythonpath = [".", "src"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.kedro_telemetry]
+project_id = "ed2724f5722541c882d4b501dbce947b"

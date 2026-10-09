@@ -1,0 +1,89 @@
+raw_store_data:
+  type: pickle.PickleDataset
+  filepath: data/raw_data/WI_2_daily.pkl
+
+cleaned_store_data:
+  type: pickle.PickleDataset
+  filepath: data/cleaned_data/WI_2_cleaned.pkl
+
+filtered_cleaned_store_data:
+  type: pickle.PickleDataset
+  filepath: data/cleaned_data/WI_2_post_june_2012.pkl
+
+engineered_data:
+  type: pickle.PickleDataset
+  filepath: data/feature_engineered_data/WI_2_engineered.pkl
+
+features:
+  type: pickle.PickleDataset
+  filepath: data/feature_engineered_data/WI_2_features.pkl
+
+target:
+  type: pickle.PickleDataset
+  filepath: data/feature_engineered_data/WI_2_target.pkl
+
+tuned_models:
+  type: pickle.PickleDataset
+  filepath: results/kedro/post_june_2012/models/tuned_models.pkl
+
+selected_model:
+  type: pickle.PickleDataset
+  filepath: results/kedro/post_june_2012/models/selected_model.pkl
+
+selected_model_name:
+  type: pickle.PickleDataset
+  filepath: results/kedro/post_june_2012/models/selected_model_name.pkl
+
+baseline_one_day:
+  type: pickle.PickleDataset
+  filepath: results/kedro/post_june_2012/models/baseline_naive_1_day.pkl
+
+baseline_one_week:
+  type: pickle.PickleDataset
+  filepath: results/kedro/post_june_2012/models/baseline_naive_1_week.pkl
+
+validation_before_cleaning:
+  type: pandas.CSVDataset
+  filepath: results/kedro/post_june_2012/validation_before_cleaning.csv
+  save_args:
+    index: true
+
+validation_after_cleaning:
+  type: pandas.CSVDataset
+  filepath: results/kedro/post_june_2012/validation_after_cleaning.csv
+  save_args:
+    index: true
+
+tuning_results:
+  type: pandas.CSVDataset
+  filepath: results/kedro/post_june_2012/tuning_results.csv
+  save_args:
+    index: false
+
+model_comparison:
+  type: pandas.CSVDataset
+  filepath: results/kedro/post_june_2012/model_comparison.csv
+  save_args:
+    index: false
+
+forecast_errors:
+  type: pandas.CSVDataset
+  filepath: results/kedro/post_june_2012/forecast_errors.csv
+  save_args:
+    index: true
+
+metrics:
+  type: json.JSONDataset
+  filepath: results/kedro/post_june_2012/metrics.json
+
+forecast_plot:
+  type: matplotlib.MatplotlibDataset
+  filepath: results/kedro/post_june_2012/forecast.png
+
+predicted_vs_actual_plot:
+  type: matplotlib.MatplotlibDataset
+  filepath: results/kedro/post_june_2012/predicted_vs_actual.png
+
+model_comparison_plot:
+  type: matplotlib.MatplotlibDataset
+  filepath: results/kedro/post_june_2012/model_comparison.png

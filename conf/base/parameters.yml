@@ -1,0 +1,8 @@
+store_id: WI_2
+data_dir: data/m5-forecasting-accuracy
+
+# This Kedro workflow intentionally covers the post-June-2012 experiment only.
+start_date: "2012-06-01"
+test_start_date: "2014-10-01"
+horizon: 1
+cv_splits: 5

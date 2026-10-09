@@ -1,0 +1,15 @@
+.venv/
+.uv-cache/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+build/
+.DS_Store
+stats.json
+
+# Raw and generated Kedro datasets are reproducible pipeline outputs.
+data/m5-forecasting-accuracy/
+data/raw_data/
+data/cleaned_data/
+data/feature_engineered_data/
+results/kedro/

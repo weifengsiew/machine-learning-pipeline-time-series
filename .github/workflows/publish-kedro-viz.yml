@@ -1,0 +1,52 @@
+name: Publish Kedro-Viz and run post-June-2012 pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/publish-kedro-viz.yml"
+      - "conf/**"
+      - "src/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "run.sh"
+      - "!**/README.md"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Publish Kedro-Viz and run pipeline
+    runs-on: ubuntu-latest
+    env:
+      KEDRO_DISABLE_TELEMETRY: "1"
+      MPLCONFIGDIR: /tmp/kedro-mplconfig
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+    steps:
+      - name: Fetch repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install project dependencies
+        run: uv sync --locked
+
+      - name: Run post-June-2012 workflow
+        run: ./run.sh
+
+      - name: Deploy Kedro-Viz to GitHub Pages
+        uses: kedro-org/publish-kedro-viz@v3
+        with:
+          project_path: "."
+          python_manager: "uv"
+          telemetry_consent: false
+          deployment_check: false
