@@ -1,15 +1,55 @@
-.venv/
-.uv-cache/
-.pytest_cache/
-.ruff_cache/
-__pycache__/
-build/
+# macOS
 .DS_Store
+
+# Python caches and build outputs
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.uv-cache/
+
+# Jupyter
+.jupyter/
+.ipynb_checkpoints/
+
+# Local configuration and secrets
+.env
+.env.*
+conf/local/*
+!conf/local/.gitkeep
+
+# Kedro and Kedro-Viz runtime artifacts
+.viz/
+.kedro/
+logs/
 stats.json
 
-# Raw and generated Kedro datasets are reproducible pipeline outputs.
+# MLflow and model artifacts
+.Rhistory
+mlflow.db
+mlruns/
+results/mlruns/
+/models/
+
+# Generated data artifacts
 data/m5-forecasting-accuracy/
 data/raw_data/
 data/cleaned_data/
 data/feature_engineered_data/
+
+# Generated Kedro validation, experiment, and reporting outputs
 results/kedro/
+results/validation/
+results/ml_experiments/
