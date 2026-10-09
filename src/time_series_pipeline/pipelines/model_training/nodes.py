@@ -1,8 +1,15 @@
 """Nodes for model tuning and learned-model selection."""
 
 import pandas as pd
+from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 
-from ml_model import MODEL_FACTORIES, MODEL_PARAM_GRIDS, Baseline, ModelTraining
+from ml_model import (
+    MODEL_FACTORIES,
+    MODEL_PARAM_GRIDS,
+    Baseline,
+    ForecastModel,
+    build_model,
+)
 
 
 def build_candidate_models() -> list[str]:
@@ -42,12 +49,37 @@ def tune_candidate_models(
     cv_splits: int,
 ) -> tuple[dict, pd.DataFrame]:
     """Tune candidate regressors using expanding time-series folds."""
-    return ModelTraining(cv_splits=cv_splits).tune_models(
-        X_train,
-        y_train,
-        model_names=candidate_models,
-        model_param_grids=candidate_grids,
-    )
+    if cv_splits < 2:
+        raise ValueError("cv_splits must be at least 2")
+
+    complete_X_train, complete_y_train = _select_complete_model_rows(X_train, y_train)
+    time_series_split = TimeSeriesSplit(n_splits=cv_splits)
+    tuned_models = {}
+    tuning_rows = []
+    for model_name in candidate_models:
+        print(f"  Tuning {model_name}...")
+        grid_search = GridSearchCV(
+            estimator=build_model(model_name),
+            param_grid=candidate_grids[model_name],
+            scoring="neg_root_mean_squared_error",
+            cv=time_series_split,
+            n_jobs=-1,
+            refit=True,
+        )
+        grid_search.fit(complete_X_train, complete_y_train)
+        tuned_models[model_name] = ForecastModel(
+            estimator=grid_search.best_estimator_
+        )
+        tuning_rows.append(
+            {
+                "model": model_name,
+                "cv_rmse": -grid_search.best_score_,
+                "best_params": grid_search.best_params_,
+            }
+        )
+        print(f"    Best CV RMSE: {-grid_search.best_score_:.2f}")
+
+    return tuned_models, pd.DataFrame(tuning_rows).sort_values("cv_rmse")
 
 
 def select_complete_rows(
@@ -59,9 +91,8 @@ def select_complete_rows(
     raw_X_test: pd.DataFrame,
 ) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.DataFrame, pd.Series, pd.DataFrame]:
     """Align complete rows for models and unscaled naive baselines."""
-    training = ModelTraining()
-    complete_X_train, complete_y_train = training.select_complete_rows(X_train, y_train)
-    complete_X_test, complete_y_test = training.select_complete_rows(X_test, y_test)
+    complete_X_train, complete_y_train = _select_complete_model_rows(X_train, y_train)
+    complete_X_test, complete_y_test = _select_complete_model_rows(X_test, y_test)
     complete_raw_X_train = raw_X_train.loc[complete_X_train.index]
     complete_raw_X_test = raw_X_test.loc[complete_X_test.index]
     return (
@@ -74,6 +105,15 @@ def select_complete_rows(
     )
 
 
+def _select_complete_model_rows(
+    features: pd.DataFrame,
+    target: pd.Series,
+) -> tuple[pd.DataFrame, pd.Series]:
+    """Keep feature rows with complete inputs and known targets."""
+    complete_rows = features.notna().all(axis=1) & target.notna()
+    return features.loc[complete_rows], target.loc[complete_rows]
+
+
 def compare_models(
     tuned_models: dict,
     complete_X_train: pd.DataFrame,
@@ -84,15 +124,37 @@ def compare_models(
     complete_raw_X_test: pd.DataFrame,
 ) -> pd.DataFrame:
     """Compare tuned models with one-day and one-week naive baselines."""
-    return ModelTraining().compare_models(
-        tuned_models,
-        complete_X_train,
-        complete_y_train,
-        complete_X_test,
-        complete_y_test,
-        baseline_train_features=complete_raw_X_train,
-        baseline_test_features=complete_raw_X_test,
-    )
+    baselines = {
+        "naive_1_day": Baseline("sales_lag_1_day"),
+        "naive_1_week": Baseline("sales_lag_1_week"),
+    }
+    comparison_rows = []
+    for baseline_name, baseline in baselines.items():
+        baseline.fit(complete_raw_X_train, complete_y_train)
+        comparison_rows.append(
+            {
+                "model": baseline_name,
+                **baseline.evaluate(
+                    complete_raw_X_train,
+                    complete_y_train,
+                    complete_raw_X_test,
+                    complete_y_test,
+                ),
+            }
+        )
+    for model_name, model in tuned_models.items():
+        comparison_rows.append(
+            {
+                "model": model_name,
+                **model.evaluate(
+                    complete_X_train,
+                    complete_y_train,
+                    complete_X_test,
+                    complete_y_test,
+                ),
+            }
+        )
+    return pd.DataFrame(comparison_rows).sort_values("test_rmse")
 
 
 def select_best_model(

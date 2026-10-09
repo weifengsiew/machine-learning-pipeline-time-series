@@ -114,10 +114,12 @@ repository's modular structure.
 | File | Responsibility |
 |---|---|
 | `src/time_series_pipeline/` | Kedro package and modular pipeline stages |
-| `src/prepare_store_data.py`, `src/clean_data.py` | Domain transformations used by Kedro nodes |
+| `src/time_series_pipeline/pipelines/data_ingestion/nodes.py` | Store-level M5 ingestion |
+| `src/time_series_pipeline/pipelines/data_cleaning/nodes.py` | Datetime and event-label cleaning |
+| `src/time_series_pipeline/pipelines/feature_engineering/nodes.py` | Post-June-2012 feature engineering |
 | `src/time_series_pipeline/pipelines/data_validation/expectations.py` | Code-defined Great Expectations suite |
 | `src/time_series_pipeline/pipelines/data_validation/reporting.py` | Tabular validation reports for Kedro artifacts |
-| `src/engineer_features.py`, `src/ml_model.py` | Feature engineering and model implementations used by Kedro nodes |
+| `src/ml_model.py` | Model primitives and reporting plots used by Kedro nodes |
 | `conf/base/catalog.yml` | Kedro dataset locations and output formats |
 | `conf/base/parameters.yml` | Post-June-2012 Kedro run parameters |
 | `.github/workflows/publish-kedro-viz.yml` | CI run and GitHub Pages publication |

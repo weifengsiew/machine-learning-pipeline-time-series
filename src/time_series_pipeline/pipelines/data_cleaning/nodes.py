@@ -2,27 +2,46 @@
 
 import pandas as pd
 
-from clean_data import CleanData
+DEFAULT_EVENT_COLUMNS = (
+    "event_name_1",
+    "event_type_1",
+    "event_name_2",
+    "event_type_2",
+)
 
 
 def clean_store_data(raw_store_data: pd.DataFrame) -> pd.DataFrame:
-    """Apply the project's existing datetime and event-label cleaning."""
-    return fill_event_nulls(
-        sort_by_datetime(convert_datetime(raw_store_data))
-    )
+    """Apply datetime conversion, sorting, and event-label cleaning."""
+    cleaned = convert_datetime(raw_store_data)
+    cleaned = sort_by_datetime(cleaned)
+    return fill_event_nulls(cleaned)
 
 
 def convert_datetime(raw_store_data: pd.DataFrame) -> pd.DataFrame:
     """Convert the store date column or index to datetime."""
-    return CleanData().convert_datetime(raw_store_data)
+    cleaned = raw_store_data.copy()
+    if "date" in cleaned.columns:
+        cleaned["date"] = pd.to_datetime(cleaned["date"], errors="coerce")
+    else:
+        cleaned.index = pd.to_datetime(cleaned.index, errors="coerce")
+    return cleaned
 
 
 def sort_by_datetime(datetime_store_data: pd.DataFrame) -> pd.DataFrame:
     """Sort the store table and set its datetime index."""
-    return CleanData().sort_by_datetime(datetime_store_data)
+    if "date" in datetime_store_data.columns:
+        sorted_data = datetime_store_data.sort_values("date").set_index("date")
+    else:
+        sorted_data = datetime_store_data.sort_index()
+    sorted_data.index.name = "datetime"
+    return sorted_data
 
 
 def fill_event_nulls(sorted_store_data: pd.DataFrame) -> pd.DataFrame:
     """Fill expected missing event labels with ``No event``."""
-    return CleanData().fill_event_nulls(sorted_store_data)
+    cleaned = sorted_store_data.copy()
+    for column in DEFAULT_EVENT_COLUMNS:
+        if column in cleaned.columns:
+            cleaned[column] = cleaned[column].fillna("No event")
+    return cleaned
 
