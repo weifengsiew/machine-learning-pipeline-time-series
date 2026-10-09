@@ -1,6 +1,6 @@
 # Time-series forecasting pipeline
 
-[Open the interactive Kedro-Viz pipeline](https://weifengsiew.github.io/machine-learning-pipeline-time-series/?types=nodes&expandAllPipelines=false&pid=__default__)
+[Open the interactive pipeline visualisation](https://weifengsiew.github.io/machine-learning-pipeline-time-series/?types=nodes&expandAllPipelines=false&pid=__default__)
 
 ## Problem
 
@@ -39,11 +39,11 @@ gitignored because the source files are large and must not be committed.
 
 ## Data pipeline
 
-The project now has one workflow: the Kedro post-June-2012 pipeline. It
+The default pipeline uses the post-June-2012 history. It
 aggregates the configured store, cleans and validates the daily series, removes
 observations before `2012-06-01`, engineers leakage-safe forecasting features,
 creates a chronological train/test split, tunes the regressors, evaluates naive
-baselines, and writes the reporting outputs under `results/kedro/`.
+baselines, and writes the reporting outputs under `results/`.
 
 ## Modelling features
 
@@ -82,16 +82,15 @@ The model search covers 40 configurations in total:
 | Neural network | 6 one-, two-, and three-layer architectures × 2 `alpha` values | 12 |
 | KNN | 5 `n_neighbors` values × 2 weighting strategies | 10 |
 
-## Kedro pipeline
+## Default pipeline
 
-The post-June-2012 workflow is also exposed as a Kedro project. Its default
-parameters retain observations from `2012-06-01`, split the test period at
+The default parameters retain observations from `2012-06-01`, split the test period at
 `2014-10-01`, tune the four configured regressors with expanding-window
 cross-validation, compare the learned models with both naive baselines, and
-write reporting artifacts to `results/kedro/post_june_2012/`. Persisted Kedro
-datasets follow the project structure under `data/raw_data/`,
+write reporting artifacts under `results/`. Persisted datasets follow the
+project structure under `data/raw_data/`,
 `data/cleaned_data/`, and `data/feature_engineered_data/`. Model and reporting
-artifacts are kept under `results/kedro/post_june_2012/`.
+artifacts are kept under the configured results directory.
 
 The modular stages are split into explicit nodes, following the reference
 repository's stage-by-stage structure:
@@ -106,24 +105,24 @@ repository's stage-by-stage structure:
 
 Each stage has its own `nodes.py` and `pipeline.py`. The
 `src/time_series_pipeline/pipeline_registry.py` module discovers and composes
-the stages into Kedro's `__default__` pipeline, following the reference
-repository's modular structure.
+the stages into the default pipeline, following the reference repository's
+modular structure.
 
 ## Repository architecture
 
 | File | Responsibility |
 |---|---|
-| `src/time_series_pipeline/` | Kedro package and modular pipeline stages |
+| `src/time_series_pipeline/` | Modular pipeline stages |
 | `src/time_series_pipeline/pipelines/data_ingestion/nodes.py` | Store-level M5 ingestion |
 | `src/time_series_pipeline/pipelines/data_cleaning/nodes.py` | Datetime and event-label cleaning |
 | `src/time_series_pipeline/pipelines/feature_engineering/nodes.py` | Post-June-2012 feature engineering |
 | `src/time_series_pipeline/pipelines/data_validation/expectations.py` | Code-defined Great Expectations suite |
-| `src/time_series_pipeline/pipelines/data_validation/reporting.py` | Tabular validation reports for Kedro artifacts |
+| `src/time_series_pipeline/pipelines/data_validation/reporting.py` | Tabular validation reports |
 | `src/time_series_pipeline/pipelines/model_training/nodes.py` | Model registries, tuning, comparison, and selection |
 | `src/time_series_pipeline/pipelines/model_evaluation/nodes.py` | Forecasting, metrics, and reporting plots |
-| `conf/base/catalog.yml` | Kedro dataset locations and output formats |
-| `conf/base/parameters.yml` | Post-June-2012 Kedro run parameters |
-| `.github/workflows/publish-kedro-viz.yml` | CI run and GitHub Pages publication |
+| `conf/base/catalog.yml` | Dataset locations and output formats |
+| `conf/base/parameters.yml` | Post-June-2012 run parameters |
+| `.github/workflows/` | CI and pipeline visualisation publication |
 | `tests/` | Unit, integration, and model-training tests |
 
 ## How to run
@@ -144,33 +143,14 @@ uv run ruff check
 uv run pytest
 ```
 
-Run the post-June-2012 Kedro pipeline with:
+Run the default post-June-2012 pipeline with:
 
 ```bash
 ./run.sh
 ```
 
-The same command is equivalent to:
-
-```bash
-uv run kedro run
-```
-
-Run an individual modular stage whose catalog inputs already exist with:
-
-```bash
-uv run kedro run --namespace feature_engineering
-```
-
-Launch the interactive visualisation locally with:
-
-```bash
-uv run kedro viz run
-```
-
-Kedro-Viz opens at `http://127.0.0.1:4141/`. Pushes to `main` run the workflow
-and publish the same graph to GitHub Pages through
-`.github/workflows/publish-kedro-viz.yml`.
+The interactive visualisation is available locally through the project's
+visualisation command. Pushes to `main` publish the same graph to GitHub Pages.
 
 The CI pipeline runs the same checks from the repository root:
 
@@ -182,11 +162,11 @@ uv run pytest
 
 ## Results
 
-The verified Kedro run uses the post-June-2012 history and the shared test
+The verified run uses the post-June-2012 history and the shared test
 window beginning on 2014-10-01. It selected linear regression by holdout test
 RMSE; naive-baseline metrics are reported in original sales units.
 
-### Kedro post-June-2012 variant
+### Post-June-2012 results
 
 | Model | Train RMSE | Test RMSE |
 |---|---:|---:|
@@ -197,9 +177,9 @@ RMSE; naive-baseline metrics are reported in original sales units.
 | Naive, one day | 794.12 | 864.14 |
 | Naive, one week | 1,024.30 | 1,140.12 |
 
-The Kedro run saves comparison tables, tuning results, validation evidence,
+The pipeline saves comparison tables, tuning results, validation evidence,
 forecast plots, a predicted-versus-actual scatter plot, forecast errors, fitted
-models, and `metrics.json` under `results/kedro/post_june_2012/`.
+models, and `metrics.json` under `results/`.
 
 Key artifacts include:
 
