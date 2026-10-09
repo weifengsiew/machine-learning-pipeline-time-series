@@ -25,22 +25,6 @@ def build_candidate_grids(candidate_models: list[str]) -> dict[str, dict]:
     }
 
 
-def tune_models(
-    X_train: pd.DataFrame,
-    y_train: pd.Series,
-    cv_splits: int,
-) -> tuple[dict, pd.DataFrame]:
-    """Tune the configured regressors using expanding time-series folds."""
-    candidate_models = build_candidate_models()
-    return tune_candidate_models(
-        X_train,
-        y_train,
-        candidate_models,
-        build_candidate_grids(candidate_models),
-        cv_splits,
-    )
-
-
 def tune_candidate_models(
     X_train: pd.DataFrame,
     y_train: pd.Series,

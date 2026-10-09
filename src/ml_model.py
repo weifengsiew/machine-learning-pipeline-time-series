@@ -1,8 +1,6 @@
 """Define, train, and evaluate the time-series forecasting models."""
 
-import pickle
 from collections.abc import Callable, Sequence
-from pathlib import Path
 
 import matplotlib
 import numpy as np
@@ -148,22 +146,6 @@ class Baseline:
             self.predict(X_test),
         )
 
-    def save(self, path: Path) -> None:
-        """Save the fitted baseline to ``path``."""
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("wb") as model_file:
-            pickle.dump(self, model_file)
-
-    @classmethod
-    def load(cls, path: Path) -> "Baseline":
-        """Load a saved baseline model."""
-        with path.open("rb") as model_file:
-            model = pickle.load(model_file)
-        if not isinstance(model, cls):
-            raise TypeError(f"Expected a {cls.__name__} artifact, got {type(model).__name__}")
-        return model
-
-
 class ForecastModel:
     """Wrap a scikit-learn-compatible regression estimator."""
 
@@ -172,24 +154,6 @@ class ForecastModel:
         self.model = estimator if estimator is not None else RandomForestRegressor(
             n_estimators=100, n_jobs=-1, random_state=0
         )
-
-    def fit(self, X: pd.DataFrame, y: pd.Series) -> "ForecastModel":
-        """Fit the wrapped estimator and return this model wrapper.
-
-        Parameters
-        ----------
-        X : pandas.DataFrame
-            Training feature rows.
-        y : pandas.Series
-            Training target values aligned with ``X``.
-
-        Returns
-        -------
-        ForecastModel
-            This fitted wrapper.
-        """
-        self.model.fit(X, y)
-        return self
 
     def predict(self, X: pd.DataFrame) -> np.ndarray:
         """Return predictions for feature rows."""
@@ -224,22 +188,6 @@ class ForecastModel:
             y_test,
             test_predictions,
         )
-
-    def save(self, path: Path) -> None:
-        """Save the fitted forecasting model to ``path``."""
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("wb") as model_file:
-            pickle.dump(self, model_file)
-
-    @classmethod
-    def load(cls, path: Path) -> "ForecastModel":
-        """Load a saved forecasting model."""
-        with path.open("rb") as model_file:
-            model = pickle.load(model_file)
-        if not isinstance(model, cls):
-            raise TypeError(f"Expected a {cls.__name__} artifact, got {type(model).__name__}")
-        return model
-
 
 def create_forecast_frame(
     actual: pd.Series,

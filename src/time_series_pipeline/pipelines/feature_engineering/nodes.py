@@ -37,20 +37,6 @@ def filter_start_date(
     ].copy()
 
 
-def engineer_features(
-    filtered_cleaned_store_data: pd.DataFrame,
-    horizon: int,
-) -> pd.DataFrame:
-    """Create leakage-safe lag, rolling, calendar, and target features."""
-    features = add_event_indicator(filtered_cleaned_store_data)
-    features = select_base_features(features)
-    features = add_lag_features(features, horizon)
-    features = add_cyclical_features(features)
-    features = add_rolling_features(features, horizon)
-    features = align_target_calendar_features(features, horizon)
-    return add_target(features, horizon)
-
-
 def add_event_indicator(
     filtered_cleaned_store_data: pd.DataFrame,
 ) -> pd.DataFrame:

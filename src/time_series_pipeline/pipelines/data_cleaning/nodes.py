@@ -10,13 +10,6 @@ DEFAULT_EVENT_COLUMNS = (
 )
 
 
-def clean_store_data(raw_store_data: pd.DataFrame) -> pd.DataFrame:
-    """Apply datetime conversion, sorting, and event-label cleaning."""
-    cleaned = convert_datetime(raw_store_data)
-    cleaned = sort_by_datetime(cleaned)
-    return fill_event_nulls(cleaned)
-
-
 def convert_datetime(raw_store_data: pd.DataFrame) -> pd.DataFrame:
     """Convert the store date column or index to datetime."""
     cleaned = raw_store_data.copy()
