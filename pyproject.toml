@@ -1,7 +1,7 @@
 [project]
 name = "ts"
 version = "0.1.0"
-description = "Group project: forecast one Walmart store's daily sales, one day ahead."
+description = "Forecast one Walmart store's daily sales one day ahead."
 requires-python = ">=3.12"
 dependencies = [
     "kedro>=0.19.14,<1.0",

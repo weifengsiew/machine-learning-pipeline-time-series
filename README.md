@@ -1,4 +1,4 @@
-# Time series: group report
+# Time-series forecasting pipeline
 
 [Open the interactive Kedro-Viz pipeline](https://weifengsiew.github.io/machine-learning-pipeline-time-series/?types=nodes&expandAllPipelines=false&pid=__default__)
 
