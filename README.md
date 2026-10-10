@@ -1,7 +1,5 @@
 # Time-series forecasting pipeline
 
-[Open the interactive pipeline visualisation](https://weifengsiew.github.io/machine-learning-pipeline-time-series/?types=nodes&expandAllPipelines=false&pid=__default__)
-
 ## Problem
 
 **Problem statement:** Walmart store managers need to estimate how many total
@@ -36,6 +34,12 @@ and calendar data from 2011-01-29 to 2016-06-19. Download these files from the
 
 Place both files in `ts/data/m5-forecasting-accuracy/`. This directory is
 gitignored because the source files are large and must not be committed.
+
+## Solution: machine learning pipeline
+
+<img src="assets/pipeline.png" alt="Kedro pipeline visualisation" width="400">
+
+[Open the Kedro pipeline visualisation](https://weifengsiew.github.io/machine-learning-pipeline-time-series/?types=nodes&expandAllPipelines=false&pid=__default__)
 
 ## Exploratory data analysis (EDA)
 
@@ -89,7 +93,7 @@ slower patterns that recur over time. This informed the decision to add sales
 lags at the corresponding horizons and cyclical calendar features to the
 modelling data.
 
-## Pipeline
+## Machine learning pipeline
 
 ### Pipeline stages
 
@@ -104,10 +108,6 @@ stages:
 6. `preprocessing` — fit transformations on training data only and apply them to both partitions.
 7. `model_training` — tune candidate regressors, compare baselines, and select the best model.
 8. `model_evaluation` — create forecasts, metrics, and plots.
-
-<img src="assets/pipeline.png" alt="Kedro pipeline visualisation" width="400">
-
-[Open the Kedro pipeline visualisation](https://weifengsiew.github.io/machine-learning-pipeline-time-series/?types=nodes&expandAllPipelines=false&pid=__default__)
 
 ### Data cleaning
 
@@ -165,12 +165,25 @@ The hyperparameter search covers 40 configurations:
 | Neural network | Layer architectures × `alpha` | 12 |
 | KNN | `n_neighbors` × weighting strategy | 10 |
 
-## Results
+The pipeline saves comparison tables, tuning results, validation evidence,
+forecast plots, a predicted-versus-actual scatter plot, forecast errors, fitted
+models, and `metrics.json` under `results/`.
 
-The results use the post-June-2012 history, the 31-lag feature set, and the
-shared test window beginning on 2014-10-01. Linear regression has the lowest
-holdout test RMSE among the learned models at `476.40`; its selected-model
-cross-validation RMSE is `524.73`. Naive baselines are included for comparison.
+### Key artifacts
+
+| Artifact | Description |
+|---|---|
+| `model_comparison.csv` | Train and test RMSE for tuned models and baselines |
+| `tuning_results.csv` | Cross-validation RMSE and selected configurations |
+| `validation_before_cleaning.json` | Complete Great Expectations result for raw data |
+| `validation_after_cleaning.json` | Complete Great Expectations result for cleaned data; must pass |
+| `validation_before_cleaning.csv` | Tabular Great Expectations results for raw data |
+| `validation_after_cleaning.csv` | Tabular Great Expectations results for cleaned data |
+| `predicted_vs_actual.png` | Selected-model predictions against actual sales with error guides |
+| `forecast_errors.csv` | Actual values, forecasts, and forecast errors |
+| `models/` | Serialized tuned models and naive baselines |
+
+## Results and discussion
 
 | Model | Test RMSE |
 |---|---:|
@@ -209,24 +222,6 @@ All tuned regressors outperform both naive baselines. Linear regression has the
 lowest holdout RMSE among the learned models and is the selected model for this
 store.
 
-The pipeline saves comparison tables, tuning results, validation evidence,
-forecast plots, a predicted-versus-actual scatter plot, forecast errors, fitted
-models, and `metrics.json` under `results/`.
-
-Key artifacts include:
-
-| Artifact | Description |
-|---|---|
-| `model_comparison.csv` | Train and test RMSE for tuned models and baselines |
-| `tuning_results.csv` | Cross-validation RMSE and selected configurations |
-| `validation_before_cleaning.json` | Complete Great Expectations result for raw data |
-| `validation_after_cleaning.json` | Complete Great Expectations result for cleaned data; must pass |
-| `validation_before_cleaning.csv` | Tabular Great Expectations results for raw data |
-| `validation_after_cleaning.csv` | Tabular Great Expectations results for cleaned data |
-| `predicted_vs_actual.png` | Selected-model predictions against actual sales with error guides |
-| `forecast_errors.csv` | Actual values, forecasts, and forecast errors |
-| `models/` | Serialized tuned models and naive baselines |
-
 ## Conclusion
 
 Linear regression has the lowest holdout RMSE among the learned models at
@@ -237,7 +232,7 @@ using future sales. The prediction interval shows that the model tracks sales
 reasonably well on most days, while the days outside the interval identify
 larger forecasting misses.
 
-## Future work
+Future work includes:
 
 - Calibrate the prediction interval to a coverage level that reflects the
   business cost of stockouts and excess stock.
