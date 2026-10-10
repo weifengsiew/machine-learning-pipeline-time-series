@@ -27,7 +27,7 @@ def split_features_and_target(
 ) -> tuple[pd.DataFrame, pd.Series]:
     """Separate the future target from the model feature table."""
     model_data = engineered_data.copy()
-    target = model_data.pop("target_next_day")
+    target = model_data.pop("target_sales")
     return model_data, target
 
 
