@@ -105,7 +105,7 @@ stages:
 7. `model_training` — tune candidate regressors, compare baselines, and select the best model.
 8. `model_evaluation` — create forecasts, metrics, and plots.
 
-<img src="assets/Screenshot%202026-10-09%20at%2010.51.51%E2%80%AFPM.png" alt="Kedro pipeline visualisation" width="400">
+<img src="assets/pipeline.png" alt="Kedro pipeline visualisation" width="400">
 
 [Open the Kedro pipeline visualisation](https://weifengsiew.github.io/machine-learning-pipeline-time-series/?types=nodes&expandAllPipelines=false&pid=__default__)
 
