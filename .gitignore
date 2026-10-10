@@ -52,3 +52,7 @@ data/feature_engineered_data/
 # Generated pipeline validation, experiment, and reporting outputs
 results/*
 !results/.gitkeep
+
+# Local documentation and agent instructions
+docs/
+agents.md
