@@ -41,6 +41,36 @@ gitignored because the source files are large and must not be committed.
 
 [Open the Kedro pipeline visualisation](https://weifengsiew.github.io/machine-learning-pipeline-time-series/?types=nodes&expandAllPipelines=false&pid=__default__)
 
+## Python frameworks
+
+This project is supported by the following Python frameworks and libraries:
+
+<p align="center">
+  <img alt="Kedro" src="https://img.shields.io/badge/Kedro-Orchestration-243B53?style=for-the-badge">
+  <img alt="Kedro-Viz" src="https://img.shields.io/badge/Kedro--Viz-Visualisation-243B53?style=for-the-badge">
+  <img alt="pandas" src="https://img.shields.io/badge/pandas-Data%20Processing-150458?style=for-the-badge&logo=pandas&logoColor=white">
+  <img alt="Great Expectations" src="https://img.shields.io/badge/Great%20Expectations-Validation-FF6319?style=for-the-badge">
+  <img alt="NumPy" src="https://img.shields.io/badge/NumPy-Feature%20Engineering-013243?style=for-the-badge&logo=numpy&logoColor=white">
+  <img alt="scikit-learn" src="https://img.shields.io/badge/scikit--learn-Modeling-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white">
+  <img alt="statsmodels" src="https://img.shields.io/badge/statsmodels-Time--Series%20Analysis-4051B5?style=for-the-badge">
+  <img alt="Matplotlib" src="https://img.shields.io/badge/Matplotlib-Visualisation-11557C?style=for-the-badge">
+  <img alt="Jupyter" src="https://img.shields.io/badge/Jupyter-EDA%20and%20Reporting-F37626?style=for-the-badge&logo=jupyter&logoColor=white">
+</p>
+
+| Pipeline stage | Python framework or library |
+| --- | --- |
+| Pipeline orchestration | Kedro |
+| Pipeline visualisation | Kedro-Viz |
+| Data ingestion and cleaning | pandas |
+| Data validation | Great Expectations, pandas |
+| Exploratory analysis and time-series diagnostics | pandas, statsmodels, Matplotlib, Jupyter |
+| Feature engineering | pandas, NumPy |
+| Chronological train/test split | pandas, scikit-learn |
+| Preprocessing | scikit-learn |
+| Model training and tuning | scikit-learn |
+| Holdout evaluation and reporting | scikit-learn, Matplotlib |
+| Dataset and model persistence | Kedro Datasets |
+
 ## Exploratory data analysis (EDA)
 
 For the full exploratory analysis, see [`eda.ipynb`](eda.ipynb).
